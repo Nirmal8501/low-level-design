@@ -1,0 +1,48 @@
+We have a weather station and display devices which will display the real time temperature.
+So a bad solution will be to have a tightly couples all display devices or a list inside the weather station object,
+and as soon as temp is updated we need to notify all the display devices
+
+So like,
+WeatherStation{
+    int temp,
+    DisplayDevice device,
+
+    constructor,
+
+    setTemp(temp){
+        this.temp = temp
+        notifyDevice()
+    }
+
+    void notify(temp){
+        device.showtemp(temp)
+    }
+}
+
+
+
+This is a bad solution, also pretty tightly coupled. Also if you have to add more devices then you will have to edit this class each time.
+Also, this is not even about that tbh, its more about who shd have control to what. Ideally weather shd not care about how many people are interested
+in knowing the temp and shdn't own the logic, all it shd care is that "Whenever I have a change, i will announce it", this way it doesn't care
+who is interested, and doesn;t know how many subscriber are there.
+
+The station says:
+
+“I don’t care who’s listening. I just announce a change.”
+
+Observers say:
+
+“I choose to listen.”
+
+That shift is the whole pattern. Basically inversion of dependency
+
+There can be lot of display devices as well.
+
+So this hints to a probable pub sub solution, a single pulisher which is the weather station and multiple subscribers which are interested in temperature
+which are our display devices.
+
+
+So according to gang of 4,
+
+DisplayDevice -> Some abstract class , this has addObserver, removeObserver and notifyObserver functionality,
+and each device will implement the observer

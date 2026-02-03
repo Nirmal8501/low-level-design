@@ -1,4 +1,4 @@
-package BehaviouralPatterns.MementoPattern;
+package BehaviouralPatterns.Memento;
 
 // It is a snapshot so hence shd be immutable in memento
 public class TextEditorMemento {
