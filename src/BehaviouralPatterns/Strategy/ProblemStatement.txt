@@ -1,0 +1,12 @@
+Motivation:
+
+Let's consider a simple payment system where users can pay using different
+methods like credit cards or PayPal. Without the Strategy Pattern, you might use
+if-else conditions to handle the different payment methods, leading to less
+maintainable and flexible code.
+
+What is the Strategy Pattern (in plain English)
+
+Strategy Pattern = encapsulate behavior, not data, and make it interchangeable at runtime.
+
+Bad code will have lot of if-else based processing here

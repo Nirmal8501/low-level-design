@@ -16,5 +16,9 @@ public class Main {
         System.out.println("\n");
         weatherStation.setTemp(200);
 
+        weatherStation.removeObserver(mobile);
+
+        weatherStation.setTemp(50000);
+
     }
 }
