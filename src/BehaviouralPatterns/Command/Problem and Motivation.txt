@@ -1,0 +1,158 @@
+Imagine you're developing a basic text editor with buttons for bold, italic, and
+underline text formatting.
+Without the Command Pattern, the buttons directly interact with the TextEditor
+class, and you’d end up hardcoding behavior into the UI classes, making them tightly
+coupled
+
+What is the Command Pattern (core idea)
+Command Pattern = turn a request into an object.
+Instead of calling a method directly, you:
+wrap the request
+along with its receiver
+into a standalone object
+
+That object can then be:
+queued
+logged
+undone
+retried
+executed later
+
+Command Pattern: The Players
+Role	Responsibility
+Command	Declares execute()
+ConcreteCommand	Binds action + receiver
+Receiver	Does the actual work
+Invoker	Triggers command
+Client	Creates & wires everything
+
+This separation is the entire point.
+
+
+By introducing the Command Pattern, we can decouple the actions (bold, italic,
+underline) from the UI components (buttons), making the design more flexible and
+maintainable. The buttons no longer need to know about the editor directly but
+instead work with generic Command objects.
+
+
+class TextEditor {
+    void boldText() {}
+    void italicizeText() {}
+    void underlineText() {}
+}
+
+class BoldButton {
+    private final TextEditor editor;
+
+    BoldButton(TextEditor editor) {
+        this.editor = editor;
+    }
+
+    void onClick() {
+        editor.boldText();
+    }
+}
+
+
+👉 This is NOT wrong by itself
+
+If this were:
+a throwaway app
+one button
+no undo
+no macros
+no extensibility
+This would be perfectly fine.
+
+So the motivation is NOT “tight coupling is bad”
+That’s a symptom, not the reason.
+
+The Real Question You Must Ask Yourself
+
+“What pressure is this code going to face in the future?”
+
+Design patterns don’t exist for today’s code
+They exist for tomorrow’s pain.
+
+Let’s apply pressure.
+
+
+Pressure #1: Buttons Are Multiplying
+
+Tomorrow you add:
+
+BoldButton
+ItalicButton
+UnderlineButton
+StrikeThroughButton
+HighlightButton   Will u keep adding the textEditor to each of these ? What shd happen instead ?
+Now ask yourself:
+Why does every button know what a TextEditor is?
+Buttons are UI controls, not business logic owners.
+
+This Is the First Intuition Trigger 🔔
+Ask this question:
+
+“Does a button conceptually care what happens when clicked?”
+
+Answer: ❌ No
+A button’s job is:
+
+“When clicked → execute something”
+
+he motivation is NOT:
+“Buttons shouldn’t depend on editors”
+
+The motivation IS:
+“Actions must be first-class citizens in my system.”
+
+
+
+The Correct Responsibility Split (Mental Model)
+Think in layers:
+[ UI / Client ]
+      ↓
+[ Command ]
+      ↓
+[ TextEditor ]
+
+Who owns user intent?
+❌ TextEditor — NO
+✅ UI / Client / Application layer
+
+
+Why Commands Usually Have a TextEditor Reference
+This is the part you explicitly asked 👇
+“But why does it have TextEditor instance?”
+Because Command is NOT the business logic.
+Command is a carrier of intent, not the executor.
+
+Correct wiring:
+Button → Command → TextEditor
+
+NOT:
+TextEditor → Button → Command
+
+
+
+Use Case:
+GUI Applications:
+● Commands can be associated with buttons, menus, and keyboard shortcuts in
+applications like text editors, spreadsheets, or drawing software.
+Task Scheduling:
+● Commands can be placed in a queue and executed later, useful in batch
+processing or deferred task execution.
+Undo/Redo Functionality:
+● Commands can be stored and rolled back to provide undo and redo
+capabilities, especially in applications like IDEs, word processors, or graphics
+software.
+Macro Recording:
+● Actions performed by the user can be recorded as a series of commands,
+which can then be played back as macros.
+
+
+Drawbacks:
+● Increased Complexity: Introducing the Command Pattern can lead to more
+classes and complexity, especially when there are many different commands.
+● Overhead: Each operation becomes an object, which may add memory and
+performance overhead in systems with large numbers of commands.
