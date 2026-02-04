@@ -1,0 +1,62 @@
+package BehaviouralPatterns.Iterator;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+class Book {
+    String name;
+
+    public Book(String name){
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+}
+
+class BookCollection implements Iterable<Book>{
+    List<Book> books = new ArrayList<>();
+
+    public void addBook(Book book){
+        books.add(book);
+    }
+
+    public List<Book> getAllBooks(){
+        return books;
+    }
+
+    @Override
+    public Iterator<Book> iterator() {
+        return new BookIterator(this.books);
+    }
+
+//    public Iterator<Book> getIterator(){
+//        return new BookIterator(this.books);
+//    }
+
+    private class BookIterator implements Iterator<Book> {
+        private final List<Book> books;
+
+        int position = 0;
+
+        public BookIterator(List<Book> books){
+            this.books = books;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return position < books.size();
+        }
+
+        @Override
+        public Book next() {
+            return books.get(position++);
+        }
+    }
+}
+
+public class Main2 {
+}

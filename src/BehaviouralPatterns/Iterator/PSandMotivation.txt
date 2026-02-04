@@ -1,0 +1,12 @@
+Motivation:
+Suppose you have a collection, such as an array or list, and you need to
+provide a mechanism for accessing its elements. Without the iterator pattern,
+the client code needs to understand how the collection is structured, and
+different collections would require different methods to traverse them.
+
+Iterator is usually implemented as a nested class within the container class.
+hasNext() and next(), so if in future u decide to keep set instead of array, u only need to edit these two methods and the main container class logic remains intact,
+and the Client who uses ur Class and code doesn;t need to know your structure to iterate, because if the structure changes later then all clients will have to change
+the logic to iterate, hence its better that ur class itself gives a way to iterate.
+
+This also creates a separtion of concerns, iteration logic is separate, n u can make differnt type of iterators like forward, backward n so on
