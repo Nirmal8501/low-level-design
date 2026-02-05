@@ -1,0 +1,24 @@
+Example:
+● In a system where different types of documents (PDF, Word, Excel) are created,
+instead of using new everywhere, a Factory Pattern can centralize object
+creation.
+
+● Inconsistent state: If multiple instances represent the same concept, they may
+hold different data.
+● Resource conflicts: If multiple instances of a resource-heavy class are
+created, it can lead to performance degradation.
+
+Where u need only single instance, like logger, configs, n so on,
+like DBPassword, ApiKey n so on, if multiple instances exist then it can become problematic because if DBPassword changes and one object is updated n other is not
+then problem, but at first place u don't need more than 1 obj.
+
+
+Multi-threading issues: Without thread safety, multiple instances of the Singleton
+class could be created in a multi-threaded environment.
+Solutions:
+○ Lazy Initialization with Synchronization: Synchronize the method that
+creates the instance.
+○ Double-Checked Locking: Optimize the performance by only locking
+when necessary.
+○ Bill Pugh Singleton Design: Uses an inner static helper class to ensure
+thread safety and lazy loading.

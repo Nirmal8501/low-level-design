@@ -1,0 +1,26 @@
+The real meaning behind the 3 pattern categories
+
+Design patterns are not about what code looks like.
+They are about what problem dimension you are controlling.
+
+Category	    What it controls	    Question it answers
+Creational	    Object birth	        Who creates what, when, and how?
+Structural	    Object composition	    How are things connected without tight coupling?
+Behavioral	    Object interaction	    Who talks to whom, and who decides?
+
+This is not arbitrary — it maps to object lifecycle phases.
+
+1️⃣ Creational Patterns — Control the birth
+Semantic intent
+
+Separate object creation from object usage
+
+Creation is volatile:
+
+config changes
+environment changes
+implementation changes
+scaling changes
+Usage should be stable.
+
+Creational patterns exist to protect stable code from unstable construction logic.
