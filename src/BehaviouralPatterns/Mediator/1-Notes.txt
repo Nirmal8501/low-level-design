@@ -1,0 +1,134 @@
+Mediator Pattern — Intuition, Motivation, Mental Map
+1️⃣ Start with the “Normal” Code (Again: not wrong yet)
+
+Imagine a UI dialog:
+TextBox: username
+TextBox: password
+Button: login
+Checkbox: remember me
+Label: error message
+
+Naive code:
+
+class LoginButton {
+    private UsernameField username;
+    private PasswordField password;
+    private ErrorLabel error;
+
+    void click() {
+        if (username.isEmpty()) {
+            error.show("Username required");
+            return;
+        }
+        if (password.isEmpty()) {
+            error.show("Password required");
+            return;
+        }
+        // proceed
+    }
+}
+
+And then:
+
+class UsernameField {
+    PasswordField password;
+    LoginButton login;
+
+    void onChange() {
+        if (!isEmpty()) {
+            login.enable();
+        }
+    }
+}
+
+2️⃣ Apply Pressure #1: Components Start Talking to Each Other
+
+Soon:
+
+Username field enables login button
+Password field disables error label
+Checkbox affects validation
+Error label reacts to everything
+Each component holds references to many others.
+
+🔔 Intuition trigger #1
+“Every component knows about every other component.”
+That’s tight coupling, but more importantly:
+Interaction logic is scattered.
+
+3️⃣ Apply Pressure #2: Interaction Rules Grow
+Now product asks:
+Disable login if password < 8 chars
+Hide error on any input
+Enable login only when both fields valid
+Disable checkbox if login fails
+Where do these rules live?
+UsernameField?
+PasswordField?
+LoginButton?
+
+Answer: Everywhere.
+
+🔔 Intuition trigger #2
+“No single place knows how the system works.”
+That’s the real problem.
+4️⃣ Apply Pressure #3: Change Becomes Dangerous
+Now you change one rule:
+“Login button stays disabled until both fields are valid”
+You now must:
+modify UsernameField
+modify PasswordField
+modify LoginButton
+You’ll break something. Guaranteed.
+
+🔔 Intuition trigger #3
+“I can’t reason about interactions anymore.”
+
+5️⃣ The Core Insight (THIS Is Mediator)
+Old mental model (wrong)
+“Components collaborate directly.”
+New mental model (right)
+“Components talk to ONE coordinator.”
+That coordinator = Mediator.
+
+6️⃣ The Mediator Mental Shift (Very Important)
+From:
+Component ↔ Component ↔ Component
+
+To:
+Component → Mediator ← Component
+
+Components:
+don’t know about each other
+only notify mediator
+
+Mediator:
+contains interaction logic
+orchestrates behavior
+
+7️⃣ Why This Is NOT Just “Helper Class”
+Mediator is not:
+a utility
+a god object (if done right)
+a service layer
+
+Mediator is:
+the place where collaboration rules live
+
+
+
+Why Mediator gets (sender, event) — not (sender, receiver, event)
+Short intuition (then we’ll unpack it):
+Because the mediator’s job is to decide who the receiver should be.
+If you already know the receiver, you’ve destroyed the reason Mediator exists.
+
+Now let’s make that intuition solid.
+
+1️⃣ What Problem Mediator Is Actually Solving
+The real problem Mediator solves is many-to-many coupling.
+Without Mediator:
+
+A ↔ B
+A ↔ C
+B ↔ C
+C ↔ D
