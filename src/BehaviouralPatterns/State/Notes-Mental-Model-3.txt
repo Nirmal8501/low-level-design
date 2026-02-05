@@ -1,0 +1,169 @@
+BAD FLOW (Control Perspective)
+
+Client
+  ↓
+Order.pay()
+  ↓
+if (status == NEW?)  ──▶ yes → change state
+  ↓
+else throw exception
+
+
+Key observations (this is important):
+
+Order knows ALL states
+Order knows ALL transitions
+Order knows ALL illegal combinations
+Behavior is centralized
+State is passive data
+
+So the flow is:
+Client → Order → conditional logic → state
+
+Why This Is Conceptually Bad (Not Just “if/else bad”)
+Ask yourself this:
+Who is deciding what is allowed?
+Answer: Order, every time.
+
+That means:
+
+Every new state = modify Order
+Every new rule = modify Order
+Order becomes a god object
+State machine is implicit, not explicit
+You are simulating polymorphism using conditionals.
+
+
+
+The GOOD Flow (State Pattern)
+
+Now let’s refactor mentally — not code yet.
+The Core Mental Flip
+From:
+“Order behaves differently depending on state”
+
+To:
+“State decides how Order behaves”
+This is the entire pattern.
+
+
+GOOD FLOW (Control Perspective)
+Client
+  ↓
+Order.pay()
+  ↓
+state.pay(order)
+  ↓
+(NewState / PaidState decides)
+  ↓
+possible transition
+
+
+Or more clearly:
+
+Client
+  ↓
+Context (Order)
+  ↓ delegates
+State object
+  ↓ decides
+Next State
+
+
+Side-by-Side Flow Comparison (THIS IS KEY)
+❌ Bad Flow
+Client
+  ↓
+Order
+  ↓
+if / else on state
+  ↓
+mutate state
+
+✅ Good Flow
+Client
+  ↓
+Order (delegates)
+  ↓
+State (polymorphism)
+  ↓
+State transition
+
+
+Why This Is Fundamentally Better
+Let’s answer why at each hop.
+1️⃣ Client → Order (same in both)
+
+Client should:
+talk to Order
+not know about state internals
+✔ Both versions satisfy this.
+
+
+2️⃣ Order → State (THIS IS THE CHANGE)
+Bad:
+Order examines state
+
+Good:
+Order delegates to state
+This answers a deep OO question:
+“Who owns the rules?”
+
+Answer:
+❌ Bad: Order owns rules
+✅ Good: Each state owns its rules
+
+
+3️⃣ State → Next State
+Bad:
+Transition logic scattered across methods
+
+Good:
+Transition logic localized in state class
+
+This gives you:
+explicit lifecycle
+readable transitions
+fewer bugs
+
+
+Why This Is Not Just Indirection for Fun
+
+Let’s take ONE rule change:
+“Paid orders can no longer be cancelled”
+
+Bad version:
+Find every if (state == PAID)
+
+Update logic
+Hope nothing breaks
+
+State version:
+Modify PaidState.cancel()
+
+Done
+That’s the payoff.
+
+
+The Real Reason State Pattern Exists
+Here is the core truth:
+State pattern is about moving decision-making closer to the data that owns it.
+
+Each state:
+knows what is allowed
+knows what is illegal
+knows what comes next
+Order no longer needs to “understand itself”.
+
+Another Mental Model (Very Useful)
+Bad Version = “Switch Statement Brain”
+
+Order asks:
+“What am I right now?”
+Then decides.
+Good Version = “Message Passing Brain”
+
+Order says:
+“Hey current state, handle this.”
+This is pure OO thinking.
+

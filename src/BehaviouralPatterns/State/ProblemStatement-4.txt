@@ -1,0 +1,25 @@
+STATE PATTERN — FULL WALKTHROUGH (BAD → GOOD)
+Problem Statement (Read Carefully)
+
+You are building a Media Player.
+
+The player has the following states:
+
+Stopped
+Playing
+Paused
+
+The player supports these operations:
+play()
+pause()
+stop()
+
+
+Rules
+Current State	    play()	             pause()	        stop()
+Stopped	           ▶️ → Playing	        ❌ Illegal	        ❌ Illegal
+Playing	           ❌ Illegal	        ⏸ → Paused	        ⏹ → Stopped
+Paused	           ▶️ → Playing	        ❌ Illegal	        ⏹ → Stopped
+
+Illegal operations should throw IllegalStateException.
+

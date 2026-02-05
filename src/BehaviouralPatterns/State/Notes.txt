@@ -1,0 +1,261 @@
+State Pattern — intuition-first, no BS
+1️⃣ Start with the “Normal” Code (Again: not wrong yet)
+
+Imagine a Document or Order or Connection.
+
+class Order {
+    enum Status { NEW, PAID, SHIPPED, CANCELLED }
+
+    private Status status;
+
+    public void pay() {
+        if (status == Status.NEW) {
+            status = Status.PAID;
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    public void ship() {
+        if (status == Status.PAID) {
+            status = Status.SHIPPED;
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    public void cancel() {
+        if (status == Status.NEW || status == Status.PAID) {
+            status = Status.CANCELLED;
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+}
+
+
+Looks fine. Works. Shippable.
+
+So again: why bother?
+
+
+
+2️⃣ Apply Pressure #1: Behavior Changes with State
+
+Read this carefully:
+
+The same method name behaves differently depending on internal state.
+That’s the smell.
+pay() is valid in NEW
+pay() is invalid in PAID
+cancel() is valid in some states, illegal in others
+🔔 Intuition trigger #1
+“My object’s behavior depends on its internal state.”
+That sentence is literally the definition of the State pattern
+
+3️⃣ Apply Pressure #2: Conditionals Start Spreading
+
+Now product grows:
+refund
+return
+retry payment
+partial shipment
+on-hold
+fraud review
+Every method becomes:
+if (state == A) { ... }
+else if (state == B) { ... }
+else if (state == C) { ... }
+
+🔔 Intuition trigger #2
+“I’m encoding a state machine using if/else.”
+That is the real problem.
+Not “too many ifs”, but implicit state machine logic.
+
+4️⃣ Apply Pressure #3: Illegal States Are Everywhere
+Nothing prevents this:
+status = SHIPPED;
+pay(); // illegal but possible
+
+You are now relying on:
+runtime checks
+exceptions
+developer discipline
+
+🔔 Intuition trigger #3
+“Invalid operations should be impossible, not checked.”
+ is a huge design insight.
+
+
+5️⃣ The Mental Shift (THIS is the State Pattern)
+Old mental model (wrong)
+“Object has state, methods check it.”
+New mental model (right)
+“State IS the behavior.”
+Instead of:
+one object + many ifs
+You get:
+many state objects
+each one knows what is allowed
+
+
+
+interface OrderState {
+    void pay(OrderContext ctx);
+    void ship(OrderContext ctx);
+    void cancel(OrderContext ctx);
+}
+
+
+
+class OrderContext {
+    private OrderState state;
+
+    public OrderContext() {
+        this.state = new NewState();
+    }
+
+    void setState(OrderState state) {
+        this.state = state;
+    }
+
+    public void pay() {
+        state.pay(this);
+    }
+
+    public void ship() {
+        state.ship(this);
+    }
+
+    public void cancel() {
+        state.cancel(this);
+    }
+}
+
+
+class NewState implements OrderState {
+    public void pay(OrderContext ctx) {
+        ctx.setState(new PaidState());
+    }
+
+    public void ship(OrderContext ctx) {
+        throw new IllegalStateException();
+    }
+
+    public void cancel(OrderContext ctx) {
+        ctx.setState(new CancelledState());
+    }
+}
+
+
+class PaidState implements OrderState {
+    public void pay(OrderContext ctx) {
+        throw new IllegalStateException();
+    }
+
+    public void ship(OrderContext ctx) {
+        ctx.setState(new ShippedState());
+    }
+
+    public void cancel(OrderContext ctx) {
+        ctx.setState(new CancelledState());
+    }
+}
+
+
+Each state:
+knows what is allowed
+knows what comes next
+
+7️⃣ Why This Is Powerful (The Real Motivation)
+✅ No conditionals
+✅ Illegal transitions are localized
+✅ Behavior is cohesive
+✅ State transitions are explicit
+✅ New states don’t modify existing ones (mostly)
+
+Most importantly:
+You’ve turned a hidden state machine into an explicit one.
+
+8️⃣ State vs Strategy (CRITICAL DIFFERENCE)
+
+This is where people mess up.
+
+They look similar, but the intent is totally different.
+
+Aspect  	            State	                                    Strategy
+Who chooses	            Object itself	                             Client
+Changes over time	    ✅ Yes	                                     ❌ Usually no
+Represents	            Condition	                                 Algorithm
+Transition logic	    Inside states	                             Outside
+“I am in…”	            Yes	                                         No
+
+
+Rule of thumb (burn this in):
+
+Strategy: “How should I do this?”
+State: “What am I right now?”
+If behavior changes because time or events passed → State
+If behavior changes because client wants a different algorithm → Strategy
+
+9️⃣ When You SHOULD Think “State Pattern”
+
+Think State when:
+
+✅ Object has clearly defined states
+✅ Behavior changes based on state
+✅ State transitions are meaningful
+✅ You see enum + if/else everywhere
+✅ You’re modeling workflows / lifecycles
+✅ Illegal operations exist
+
+Classic examples:
+
+TCP connection
+
+Order lifecycle
+
+Media player (playing/paused)
+
+Trading order states
+
+Authentication flow
+
+Circuit breaker
+
+🔟 When You Should NOT Use State
+
+❌ Only 1–2 states
+❌ No behavioral difference
+❌ State does not affect logic
+❌ Pure data state, no behavior
+❌ Overhead outweighs benefit
+
+Don’t replace a boolean with 5 classes.
+
+11️⃣ The “Senior Engineer” Litmus Test
+
+Ask yourself:
+
+“Am I writing code to prevent illegal actions?”
+
+If YES → State pattern wants to exist.
+
+State pattern makes illegal states unrepresentable (or at least localized).
+
+12️⃣ Final Mental Model (Tattoo This)
+
+State pattern replaces conditionals with polymorphism over time.
+
+Not structure.
+Not algorithms.
+Time + events.
+
+
+Pattern Ladder (So Far)
+Pattern	Core Question
+Strategy	How should this be done?
+Command	What action is this?
+Template	What must not change?
+Iterator	Who controls traversal?
+State	What am I right now?

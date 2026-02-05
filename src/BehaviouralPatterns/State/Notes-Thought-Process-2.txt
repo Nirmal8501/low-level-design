@@ -1,0 +1,159 @@
+How to Derive State Pattern — Step by Step Thinking
+
+I’ll use a concrete example (Order / Document / Connection), but the steps are domain-agnostic.
+
+STEP 0: Confirm You Even Need State Pattern
+Before touching code, ask:
+“Does the same operation behave differently depending on internal state?”
+
+If the answer is ❌ no → stop.
+If the answer is ✅ yes → continue.
+
+Example signals:
+if (status == X) everywhere
+illegal operations
+lifecycle stages
+time-dependent behavior
+
+STEP 1: Write the BAD Version First (This Is Mandatory)
+
+Do not jump to patterns.
+Write the naive version with enum + if/else.
+void pay() {
+    if (state == NEW) { ... }
+    else throw ...
+}
+
+Why?
+Because this reveals:
+all states
+all operations
+illegal combinations
+This is your truth table.
+
+
+STEP 2: Identify the Operations, Not the States
+This is the first critical mental shift.
+Look at your public API and ask:
+“What are the messages clients send to this object?”
+
+Example:
+pay()
+ship()
+cancel()
+refund()
+
+These become methods on the State interface.
+
+❗ Important
+Do NOT create interfaces per state yet.
+First extract behavioral operations.
+
+
+STEP 3: Create the State Interface from Operations
+Now you define:
+
+interface OrderState {   (Basically state ke upar depend kar raha hai ki mai kya action lunga, instead of doing ki action ke andar state manipulation)
+    void pay(OrderContext ctx);
+    void ship(OrderContext ctx);
+    void cancel(OrderContext ctx);
+}
+
+Why?
+State = behavior
+Interface = contract for all states
+Every state must respond to every message
+Even illegal operations must be represented.
+This forces discipline.
+
+
+STEP 4: Create the Context (Minimal, Dumb)
+
+Now define the context:
+class OrderContext {
+    private OrderState state;
+
+    public void pay() {
+        state.pay(this);
+    }
+}
+
+STEP 5: List All States Explicitly
+
+Now go back to Step 1 and list all states:
+
+NEW
+PAID
+SHIPPED
+CANCELLED
+
+Each of these becomes a class, not a flag.
+This is the second mental shift:
+“State is an object, not a value.”
+
+
+STEP 6: Implement One State Fully (Don’t Jump)
+
+Pick one state and implement all methods:
+
+class NewState implements OrderState {
+
+    public void pay(OrderContext ctx) {
+        ctx.setState(new PaidState());
+    }
+
+    public void ship(OrderContext ctx) {
+        throw new IllegalStateException();
+    }
+
+    public void cancel(OrderContext ctx) {
+        ctx.setState(new CancelledState());
+    }
+}
+
+
+Why this works:
+You see illegal transitions immediately
+You see next-state logic clearly
+You eliminate branching
+
+STEP 8: Decide Where Transition Logic Lives
+
+Ask:
+“Who is allowed to decide the next state?”
+
+In classic State pattern:
+Each state decides what it can transition to
+
+Alternative:
+Central transition table (FSM style)
+
+Rule of thumb:
+
+Simple flows → transitions in state
+Complex graphs → external transition table
+
+STEP 9: Harden the Design (Senior Step)
+
+Now apply constraints:
+
+🔒 Make states immutable
+final class PaidState implements OrderState
+
+🔒 Make state instances reusable (optional)
+static final OrderState PAID = new PaidState();
+
+🔒 Hide setState() from outsiders
+void setState(OrderState state) { ... }
+
+The goal:
+
+Illegal transitions must be impossible to express accidentally.
+
+STEP 10: Sanity Check (This Is Important)
+Ask yourself these questions:
+Can client force an illegal operation?
+Can context accidentally skip a state?
+Can states leak domain internals?
+Is there still any if (state == ...) left?
+If yes → refactor.
