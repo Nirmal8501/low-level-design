@@ -1,0 +1,135 @@
+Prototype is the hardest creational pattern to “feel” because it doesn’t fix an obvious smell like if/else or enum + switch.
+
+First: Why Prototype Feels Useless at First
+
+Most people think:
+“Why not just use new?”
+That’s because most examples hide the real pain.
+
+Prototype does NOT exist to:
+reduce typing
+avoid constructors for fun
+
+It exists to solve copying + creation coupling problems.
+
+The Core Intuition (THIS Is the Breakthrough)
+Stop thinking:
+“Prototype is an alternative to new”
+
+Start thinking:
+“Prototype is an alternative to re-running creation logic.”
+
+
+Example 1: Graphic Editor (This Is the Canonical Case)
+Problem Statement
+
+You’re building a drawing app (Figma / Paint).
+
+Users can:
+
+draw a shape
+
+duplicate it (Ctrl + D)
+
+paste it many times
+
+❌ Naive Approach (Feels Fine Initially)
+class Rectangle {
+    int x, y, width, height;
+    Color color;
+}
+
+
+User clicks Duplicate.
+
+How do you duplicate?
+
+Rectangle copy = new Rectangle(
+    original.x,
+    original.y,
+    original.width,
+    original.height,
+    original.color
+);
+
+Why this is actually bad
+UI layer knows how to construct Rectangle
+If Rectangle changes → UI breaks
+Deep copy logic leaks everywhere
+Works only if you know the concrete type
+
+🔔 Intuition Trigger
+“Why does the UI know how to copy a Rectangle?”
+
+That’s the smell.
+
+✅ Prototype Solution
+interface Shape {
+    Shape copy();
+}
+
+class Rectangle implements Shape {
+    public Shape copy() {
+        return new Rectangle(this.x, this.y, this.width, this.height, this.color);
+    }
+}
+
+Now UI just does:
+Shape duplicate = selectedShape.copy();
+
+Mental shift:
+The object knows how to copy itself.
+
+
+Example 2: Game Characters (This One Makes It Click)
+Problem
+
+In a game:
+
+You have enemies
+
+Many enemies share base attributes
+
+But differ slightly
+
+Example:
+
+Goblin (base)
+
+Goblin with sword
+
+Goblin with armor
+
+❌ Without Prototype (Constructor Hell)
+new Enemy(type, hp, damage, armor, ai, animation, sounds);
+
+
+Or:
+
+Enemy goblin = new Enemy(...);
+Enemy goblinWithSword = new Enemy(
+    goblin.hp,
+    goblin.damage + 10,
+    goblin.armor,
+    goblin.ai,
+    goblin.animation
+);
+
+
+Now:
+
+Spawning logic knows internals
+
+Copy semantics are scattered
+
+🔔 Intuition Trigger
+
+“Spawning logic should not know how enemies are built.”
+
+✅ Prototype Approach
+Enemy goblinPrototype = new Enemy(...);
+
+Enemy goblin1 = goblinPrototype.copy();
+Enemy goblin2 = goblinPrototype.copy();
+
+
