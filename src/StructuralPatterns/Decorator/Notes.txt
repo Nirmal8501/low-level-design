@@ -1,0 +1,67 @@
+Decorator exists to add behavior to an object without changing its class and without subclass explosion.
+
+The key words:
+add behavior
+runtime
+composition, not inheritance
+
+2️⃣ The Core Problem That Creates Decorator
+
+Let’s start with pressure.
+You have a base object
+Example:
+Coffee
+
+Now requirements grow:
+Milk coffee
+Sugar coffee
+Milk + sugar coffee
+Milk + sugar + cream coffee
+Sugar-free milk coffee
+etc…
+
+🔔 Intuition trigger #1
+“Features combine multiplicatively.”
+This is the real smell.
+
+3️⃣ The Naive (Bad) Solution: Inheritance Explosion
+
+class Coffee {}
+class MilkCoffee extends Coffee {}
+class SugarCoffee extends Coffee {}
+class MilkSugarCoffee extends Coffee {}
+class MilkSugarCreamCoffee extends Coffee {}
+
+Why this is fundamentally broken
+Number of classes = combinations
+Order matters
+Impossible to scale
+Changes ripple everywhere
+
+This is not “bad Java”, this is bad modeling.
+
+4️⃣ The Key Mental Shift (THIS IS DECORATOR)
+Stop thinking:
+“I need a new type for every feature combo”
+
+Start thinking:
+“Features are objects too.”
+
+Instead of:
+CoffeeWithMilkAndSugar
+
+
+Think:
+Sugar(Milk(Coffee))
+
+7️⃣ Why Decorator Is Structural (Not Behavioral)
+
+Decorator:
+
+doesn’t decide what happens
+doesn’t manage state transitions
+doesn’t encode workflows
+It only changes how objects are composed.
+
+Behavior is additive, not conditional.
+
