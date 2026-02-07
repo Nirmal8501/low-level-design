@@ -1,0 +1,141 @@
+Example: API Gateway as a Facade
+● In microservices architectures, an API Gateway acts as a facade, providing
+a simple interface to clients while hiding the complexity of multiple
+microservices working behind the scenes.
+
+Facade Pattern
+Problem: Large, complex subsystems with many classes and methods can be
+difficult to use directly.
+Solution: The Facade Pattern provides a simple, unified interface to a complex
+subsystem, making it easier to interact with.
+
+
+Basically, think of like an external client wants to call ur service for something,
+now this client might have to do like call microservice 1 then fetch the result and
+do something n call micro 2 and send result to micro 3 n so on, so why shd the client care about our architecture ?
+
+So instead we will make a service 4 which the client will connect to and this service will manage all the calls,
+basically acting as a facade.
+
+🔔 Intuition Trigger #1
+
+“Why does every client need to know all these steps?”
+
+This is the key smell.
+
+The problem is not behavior.
+The problem is usage complexity.
+
+
+2️⃣ What Facade Is REALLY Solving
+Facade solves cognitive overload.
+
+Not performance.
+Not extensibility.
+Not behavior.
+
+Facade exists so clients don’t need to understand the subsystem.
+
+
+3️⃣ The Core Mental Shift (THIS Is Facade)
+Stop thinking:
+“I need to refactor these classes”
+
+Start thinking:
+“I need a simpler front door.”
+
+Facade:
+does NOT replace subsystems
+does NOT add logic
+does NOT hide functionality (internally)
+
+It just presents a simpler API.
+
+4️⃣ The Mental Model
+Without Facade (BAD)
+
+Client
+  ↓
+AuthService
+  ↓
+ProfileService
+  ↓
+PermissionService
+  ↓
+NotificationService
+
+Client knows:
+order
+dependencies
+orchestration
+
+
+With Facade (GOOD)
+
+Client
+  ↓
+UserOnboardingFacade
+  ↓
+Subsystems
+
+
+Client:
+knows one class
+calls one method
+doesn’t care how it works
+
+7️⃣ Why Facade Is Structural (Important)
+
+Facade:
+does not change how subsystems work
+does not modify algorithms
+changes how objects are accessed
+
+It restructures the dependency graph.
+
+
+8️⃣ Facade vs Mediator (Very Important Distinction)
+
+These are commonly confused.
+
+Aspect	                    Facade	                        Mediator
+Purpose	                    Simplify usage	                Coordinate interaction
+Who owns logic	            Client-facing	                System-wide
+Direction	                One-way	                        Many-to-many
+Subsystems know facade?	    ❌	                            ✅
+Typical use	                API cleanup	                    Workflow coordination
+
+
+Rule of thumb:
+Facade → “Make it easier to use”
+Mediator → “Make it easier to change interactions”
+
+
+
+| Adapter                  | Facade                   |
+| ------------------------ | ------------------------ |
+| Fixes interface mismatch | Simplifies interface     |
+| One-to-one               | One-to-many              |
+| Same responsibility      | Higher-level abstraction |
+
+
+🔟 When You SHOULD Think “Facade”
+
+Think Facade when:
+
+✅ Client code is messy
+✅ Clients repeat orchestration logic
+✅ You want to decouple clients from internals
+✅ Subsystems are stable but complex
+✅ You want clean APIs for layers
+
+Typical places:
+Service layer
+API gateways
+SDKs
+Library entry points
+Controllers calling domain logic
+
+
+
+Now any change in microservices will be tackled by the facade, client doesn't need to care.
