@@ -1,0 +1,133 @@
+● Problem: Sometimes, direct access to an object might not be desirable due to
+reasons such as security, resource optimization, or controlled access.
+● Solution: The Proxy Pattern provides a surrogate or placeholder for another
+object to control access to it.
+
+1️⃣ Start with the Real Problem (Not the Pattern)
+
+You have an object that works.
+But something about accessing it is problematic.
+Examples:
+
+Object is expensive to create
+Object is remote
+Object needs access control
+Object needs logging / monitoring
+Object should be loaded lazily
+
+Important:
+
+The behavior of the object is correct.
+The way it is accessed is not.
+
+That is the key smell.
+
+2️⃣ The Core Intuition Trigger 🔔
+Ask yourself:
+
+“I don’t want to change what this object does — I want to control how it is used.”
+That sentence is the birth of Proxy.
+
+3️⃣ The Mental Model (THIS is Proxy)
+Stop thinking:
+“I need to add behavior to this object”
+
+Start thinking:
+“I need a stand-in for this object.”
+
+A Proxy is:
+a substitute
+with the same interface
+that controls access to the real object
+Client doesn’t know (or care) whether it’s talking to:
+the real object
+or a proxy
+
+6️⃣ Why Proxy Is Structural (Important)
+
+Proxy:
+does NOT change algorithm
+does NOT add domain behavior
+changes object relationship
+It inserts itself between client and real object.
+That’s pure structure.
+
+7️⃣ The 4 Most Important Types of Proxy (Real World)
+This is where Proxy becomes practical.
+
+🔹 1. Virtual Proxy (Lazy Loading)
+
+Problem: Object is expensive to create.
+
+class ImageProxy implements Image {
+    private RealImage image;
+
+    public void display() {
+        if (image == null) {
+            image = new RealImage("photo.png");
+        }
+        image.display();
+    }
+}
+
+Used everywhere:
+images
+large documents
+DB entities (Hibernate proxies)
+
+
+🔹 2. Protection Proxy (Access Control)
+Problem: Not everyone should call everything.
+
+class SecureServiceProxy implements Service {
+    public void request() {
+        if (!currentUser.isAdmin()) {
+            throw new SecurityException();
+        }
+        real.request();
+    }
+}
+
+🔹 3. Remote Proxy
+
+Problem: Object lives in another process / machine.
+
+class RemoteServiceProxy implements Service {
+    public void request() {
+        sendHttpRequest();
+    }
+}
+
+Client thinks it’s local.
+Used in:
+RMI
+gRPC
+REST clients
+
+🔹 4. Caching Proxy
+
+Problem: Calls are expensive, results repeat.
+
+class CachedServiceProxy implements Service {
+    Map<Key, Result> cache;
+
+    public Result request(Key k) {
+        return cache.computeIfAbsent(k, real::request);
+    }
+}
+
+
+8️⃣ Proxy vs Decorator (CRITICAL DISTINCTION)
+
+This is where people get confused.
+
+Aspect	                Proxy	                            Decorator
+Intent	                Control access	                    Add behavior
+Transparency	        Often invisible	                    Often explicit
+Focus	                Lifecycle / access	                Feature extension
+Client awareness	    Usually none	                    Often yes
+Number stacked	        Usually 1	                        Many
+
+🔔 Intuition Trigger (Repeat)
+“This is not business logic — this is access logic.”
+That belongs in a Proxy.
