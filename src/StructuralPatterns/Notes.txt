@@ -1,0 +1,31 @@
+1️⃣ First: What Structural Patterns Are Really About
+
+Forget GoF definitions for a second.
+Structural patterns are about controlling how objects are connected, not how they are created or behave over time.
+They answer questions like:
+Who holds a reference to whom?
+Who talks directly, and who shouldn’t?
+How do I reshape existing objects without changing them?
+They are about object wiring.
+
+2️⃣ The Core Problem Structural Patterns Solve
+Start with this very common situation
+
+You already have:
+working classes
+stable logic
+tested behavior
+
+But now:
+the shape of the system is wrong
+
+Examples:
+API mismatch
+Too many dependencies
+Ugly call chains
+Exposed internals
+Tight coupling
+
+🔔 Intuition trigger
+“The problem is not what the code does — it’s how it’s connected.”
+

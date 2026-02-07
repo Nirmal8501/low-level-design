@@ -1,0 +1,47 @@
+The Adapter Pattern is a structural design pattern that
+allows objects with incompatible interfaces to work
+together.
+
+PS:
+Imagine you are working on an e-commerce application that needs to send email
+notifications to customers. Currently, you are using your own in-house
+EmailNotificationService, but now you want to integrate a popular third-party email
+service like SendGrid. However, the interface for your in-house system and the SendGrid
+service are incompatible.
+
+Let's see how the Adapter Pattern can solve this problem.
+
+
+Because when calling from main or any client, u shouldn'u try to tweak the params there as then the clientt knows,
+also the new Grid class has no reason to change because of the emailService, hence Adapter pattern is usefyl.
+
+Adapter:
+does not change what happens
+changes how objects connect
+
+It reshapes the dependency graph.
+
+
+9️⃣ When You SHOULD Think “Adapter”
+
+Think Adapter when:
+
+✅ You have an interface mismatch
+✅ You integrate third-party / legacy code
+✅ You don’t own the dependency
+✅ You want zero client changes
+✅ You need to translate data formats
+
+Typical triggers:
+
+“It almost matches”
+“Just need a small conversion”
+“Can’t touch that code”
+
+🔟 When You Should NOT Use Adapter
+
+❌ To add business logic
+❌ To fix bad domain design
+❌ To hide complexity (use Facade)
+❌ To extend behavior (use Decorator)
+❌ When you control both sides
