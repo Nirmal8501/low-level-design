@@ -58,12 +58,12 @@ public class ParkingLot {
     }
 
     // Responsiblity -> Unpark the vehicle and calculate fee and release the ticket
-    public Double unparkVehicle(ParkingTicket ticket) {
+    public Float unparkVehicle(ParkingTicket ticket) {
         ticket.getParkingSpot().unparkVehicle(ticket.getVehicle());
         ticket.setExitTimeStamp(Instant.now());
         activeTickets.remove(ticket.getId());
 
-        feeStrategy.
+        return feeStrategy.calculateFee(ticket);
     }
 
     private ParkingTicket generateParkingTicket(Vehicle vehicle, ParkingSpot parkingSpot) {
