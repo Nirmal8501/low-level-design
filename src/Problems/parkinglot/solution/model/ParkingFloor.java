@@ -7,10 +7,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ParkingFloor {
+
     private int floorNumber;
     private Map<String, ParkingSpot> parkingSpots;
 
-//    displayInfo(), getAvailableParkingSpot(): ParkingSpot, addSpot
 
     public ParkingFloor(int floorNumber) {
         this.floorNumber = floorNumber;
@@ -50,7 +50,7 @@ public class ParkingFloor {
     }
 
 
-    public int getFloorNumber(){
+    public int getFloorNumber() {
         return floorNumber;
     }
 
