@@ -63,7 +63,7 @@ public class ParkingLot {
         ticket.setExitTimeStamp(Instant.now());
         activeTickets.remove(ticket.getId());
 
-        // TODO: Checkpoint
+        feeStrategy.
     }
 
     private ParkingTicket generateParkingTicket(Vehicle vehicle, ParkingSpot parkingSpot) {
