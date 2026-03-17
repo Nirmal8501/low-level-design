@@ -5,10 +5,13 @@ import Problems.parkinglot.solution.model.ParkingSpot;
 import Problems.parkinglot.solution.model.ParkingTicket;
 import Problems.parkinglot.solution.model.Vehicle;
 import Problems.parkinglot.solution.strategy.fee.FeeStrategy;
+import Problems.parkinglot.solution.strategy.fee.HourlyFeeStrategy;
+import Problems.parkinglot.solution.strategy.parking.FindClosestParkingStrategy;
 import Problems.parkinglot.solution.strategy.parking.ParkingStrategy;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ParkingLot {
 
@@ -16,16 +19,16 @@ public class ParkingLot {
 
     private ParkingStrategy parkingStrategy;
     private FeeStrategy feeStrategy;
-    private List<ParkingFloor> parkingParkingFloors;
+    private List<ParkingFloor> parkingFloors;
     private Map<String, ParkingTicket> activeTickets;
 
     private ParkingLot() {
 //        TODO: Inititialize Constructor
-//        parkingFloors = new ArrayList<>();
-//        activeTickets = new HashMap<>();
-//        this.feeStrategy = new FlatRateFeeStrategy();
-//        this.parkingStrategy = new BestFitStrategy();
-//        this.activeTickets = new ConcurrentHashMap<>();
+        parkingFloors = new ArrayList<>();
+        activeTickets = new HashMap<>();
+        this.feeStrategy = new HourlyFeeStrategy();
+        this.parkingStrategy = new FindClosestParkingStrategy();
+        this.activeTickets = new ConcurrentHashMap<>();
     }
 
     // Responsibilities -> ParkVehicle, Release Vehicle, Store active tickets, ParkingStrategy (Find a parking spot) -> So what shd this take as argument ? umm List of floors and does it need to know about vehicle ?, FeeStrategy (Calculate fee, maybe based on Vehicle size, time parked or whatever, endless possiblities)
@@ -38,12 +41,12 @@ public class ParkingLot {
     }
 
     public void addFloor(ParkingFloor parkingFloor) {
-        parkingParkingFloors.add(parkingFloor);
+        parkingFloors.add(parkingFloor);
     }
 
     // Responsibility -> Find spot, Park the vehicle if spot is found and return the ticket.
     public Optional<ParkingTicket> parkVehicle(Vehicle vehicle) {
-        Optional<ParkingSpot> parkingSpot = parkingStrategy.findParkingSpot(parkingParkingFloors, vehicle);
+        Optional<ParkingSpot> parkingSpot = parkingStrategy.findParkingSpot(parkingFloors, vehicle);
 
         if (parkingSpot.isPresent()) {
             parkingSpot.get().parkVehicle(vehicle);
@@ -89,11 +92,11 @@ public class ParkingLot {
     }
 
     public List<ParkingFloor> getParkingFloors() {
-        return parkingParkingFloors;
+        return parkingFloors;
     }
 
     public void setParkingFloors(List<ParkingFloor> parkingParkingFloors) {
-        this.parkingParkingFloors = parkingParkingFloors;
+        this.parkingFloors = parkingParkingFloors;
     }
 
     public Map<String, ParkingTicket> getActiveTickets() {

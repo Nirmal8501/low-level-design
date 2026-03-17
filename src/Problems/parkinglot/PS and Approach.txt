@@ -73,3 +73,215 @@ Missed abstractions
 
 Step 8 — Rewrite Key Parts (20 min)
 Rewrite better version yourself.
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Step 3 and 4 deep dive
+
+When assigning responsibility, ask one question:
+Which object actually owns this data?
+Behavior should live with the data it operates on. This is the foundation of Object-Oriented Design and encapsulation.
+
+1. principle -> Objects represent real ownership
+    Wrong Design
+    ParkingLot.canVehicleFit(spot, vehicle)
+
+    ParkingLot shouldn't know how a spot works.
+    That leaks internal logic.
+
+    Correct Design
+    ParkingSpot.canFit(vehicle)
+    Behavior is attached to the object owning the state.
+
+
+2. Responsibility Assignment Rule (The Expert Mental Model)
+
+Use this 3-step rule.
+
+    Rule 1 — Behavior lives where the data lives
+
+    Rule 2 — The coordinator orchestrates objects
+    Higher-level objects coordinate, not implement logic.
+
+    Example:
+    ParkingLot coordinates floors.
+
+    ParkingLot
+       parkVehicle()
+
+    But it doesn't implement parking logic.
+    Instead it delegates.
+
+    ParkingLot.parkVehicle(vehicle)
+         -> ask floors for available spot
+         -> assign vehicle
+         -> generate ticket
+
+    ParkingLot is an orchestrator, not executor.
+
+
+   Rule 3 — Traversal objects search collections
+
+   Objects that hold collections perform search.
+   Example:
+
+   ParkingFloor
+       List<ParkingSpot>
+
+   So:
+   ParkingFloor.getAvailableSpot(vehicle)
+   makes sense.
+   Because it owns the list.
+
+3. Applying the Rules to Parking Lot
+
+    Let's reason like an architect.
+
+    Step 1 — Data Ownership
+    ParkingLot
+       floors
+
+    ParkingFloor
+       spots
+
+    ParkingSpot
+       vehicle
+       type
+
+    Step 2 — Behavior Attachment
+
+    Now attach behavior.
+    ParkingSpot
+    Owns occupancy.
+    Therefore:
+
+    assignVehicle()
+    removeVehicle()
+    canFit(vehicle)
+    isAvailable()
+
+    ParkingFloor
+    Owns list of spots.
+
+    Therefore:
+    getAvailableSpot(vehicle)
+    getFreeSpotsCount()
+    addSpot()
+
+    ParkingLot
+    Owns floors.
+
+    Therefore:
+    parkVehicle(vehicle)
+    unparkVehicle(ticket)
+    getAvailability()
+
+    But these methods delegate work.
+
+    Ticket
+    Owns parking metadata.
+
+    ticketId
+    entryTime
+    spot
+    vehicle
+
+    Therefore:
+
+    calculateFee()
+
+4. Why Not ParkingLevel.parkVehicle() ?
+
+    Why not make ParkingLevel.parkVehicle()
+
+    We decide based on system boundary responsibility.
+
+    Who is the entry point of the system?
+
+    In real life:
+
+    Driver interacts with ParkingLot, not a floor.
+
+    Driver → ParkingLot
+    ParkingLot → Floor
+    Floor → Spot
+
+    So API should start at ParkingLot.
+
+    This is Facade pattern thinking.
+
+    Architecture View
+    Client
+       ↓
+    ParkingLot (system entry point)
+       ↓
+    ParkingFloor (collection manager)
+       ↓
+    ParkingSpot (state owner)
+
+
+5. Relationship Thinking (Step 3)
+
+    Relationships are basically composition trees.
+    Ask:
+    What contains what?
+
+    Parking Lot example:
+
+    ParkingLot
+        └── ParkingFloor
+                └── ParkingSpot
+
+    This is HAS-A relationship.
+
+    Identify Relationship Types
+
+    In LLD we mostly use:
+
+    Composition (Strong Ownership)
+    ParkingLot → ParkingFloor
+    ParkingFloor → ParkingSpot
+
+    Floor cannot exist without lot.
+
+    Association
+    Ticket → ParkingSpot
+    Ticket → Vehicle
+
+    Ticket references them but doesn't own lifecycle.
+
+    Dependency
+    PaymentService → Ticket
+
+    Uses it temporarily.
+
+
+6. Expert Trick for Step 3
+
+Draw a containment tree first.
+
+Example:
+
+ParkingLot
+    floors
+        spots
+
+Then attach external objects:
+
+Vehicle
+Ticket
+Payment
+
+
+
+7. So there are Pure Domain Objects -> Pure State + Rules (Spot, Floot, Vehicle, Ticket), then there
+are Orchestrator (ParkingLot, ParkingService), and then there is Infra -> External Systems (PaymentGateway, DisplayBoard, NotificationService)
+
+
+
+So in short:
+1) Identify Entities 2) Draw containment tree 3) Identify data ownership 4) Attach behavior 5) Orchestrator
