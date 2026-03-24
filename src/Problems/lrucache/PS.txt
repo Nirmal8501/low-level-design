@@ -1,0 +1,28 @@
+Design and implement an LRU (Least Recently Used) Cache with a fixed capacity.
+The cache should support fast retrieval and insertion,
+and automatically evict the least recently used item when the capacity is exceeded.
+
+Step 1 (Understand problem, Functional Req, Non Func Req and Constraints)
+    1) We need some data structure to support insertion and retrieval of Objects  F
+    2) We need some mechanism to place the most recently used object directly at front/top (As soon as get is called on any object, it shd come at top and all others shift by one -> Gives hint of LinkedList)  F
+    3) So if each recently used item is placed at top, the bottom/last becomes the item to evict from cache   F
+    4) Fixed Capacity, Fast Operations (Insert and retrieve) -> Maybe O(1), Eviction Policy    F
+    5) Maybe extensiblity ? Easy to change eviction policy    NF
+    6) Constraint -> Capacity C
+
+
+Step 2
+    Identify core entities.
+        Cache
+        LRUCache
+        EvictionPolicy
+
+
+Step 3      Relationships
+    LRUCache has EvictionPolicy, EvictionPolicy can exist without LRUCache
+
+Step 4      Responsibilities
+    Cache -> Interface -> getKey(T key), put(T Key, V Value), setEvictionPolicy()
+
+Step 5      Design Pattern
+
